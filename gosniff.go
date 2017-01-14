@@ -13,6 +13,7 @@ import (
 
 var (
 	device       string = "wlp4s0"
+	suck         string = "tcp and port 443"
 	snapshot_len int32  = 65535
 	promiscuous  bool   = false
 	err          error
@@ -21,28 +22,29 @@ var (
 )
 
 func main() {
-	//Arguments
-	//os.Args = []string{"gosniff", "--interface", "eth0"}
 
 	app := &cli.App{
-		Name:  "gosniff",
-		Usage: "gosniff --interface eth0",
+		Name:    "gosniff",
+		Usage:   "gosniff --interface eth0 --sniff \"tcp and port 80\"",
+		Version: "0.0.1",
 		Flags: []cli.Flag{
 			&cli.StringFlag{Name: "interface, i", Value: "eth0", Usage: "the interface to use", Destination: &device},
+			&cli.StringFlag{Name: "sniff, s", Value: "tcp and port 443", Usage: "the BPF syntax parameters to sniff on", Destination: &suck},
 		},
 		Action: func(c *cli.Context) error {
-			fmt.Printf("Interface %v\n", c.String("interface"))
-			sniff(device)
+			fmt.Printf("Capturing on Interface %v\n with BPF syntax: %v\n", c.String("interface"), c.String("suck"))
+			sniff(device, suck)
 			return nil
 		},
+
 		UsageText: "app [first_arg] [second_arg]",
-		Authors:   []*cli.Author{{Name: "Fernandez, Chris", Email: "cfernandez@protonmail.ch"}},
+		Authors:   []*cli.Author{{Name: "Fernandez,Chris ReK2", Email: "cfernandez@protonmail.ch"}},
 	}
 
 	app.Run(os.Args)
 }
 
-func sniff(device string) string {
+func sniff(device string, suck string) string {
 
 	// Open device
 	handle, err = pcap.OpenLive(device, snapshot_len, promiscuous, timeout)
@@ -52,11 +54,11 @@ func sniff(device string) string {
 	defer handle.Close()
 
 	// Set filter
-	err = handle.SetBPFFilter("tcp and port 80")
+	err = handle.SetBPFFilter(suck)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Capturing TCP port 80 packets.")
+	fmt.Println("Capturing %v", suck)
 
 	// Process packets
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
