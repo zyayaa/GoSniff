@@ -5,5 +5,6 @@ A network sniffer in the go language
 using gopacket libs as base.
 
 ##### Usage:
-BPF syntax
+-BPF syntax
+
 sudo ./gosniff --interface eth0 --sniff "tcp and port 80"
