@@ -32,7 +32,7 @@ func main() {
 			&cli.StringFlag{Name: "sniff, s", Value: "tcp and port 443", Usage: "the BPF syntax parameters to sniff on", Destination: &suck},
 		},
 		Action: func(c *cli.Context) error {
-			fmt.Printf("Capturing on Interface %v\n with BPF syntax: %v\n", c.String("interface"), c.String("suck"))
+			fmt.Printf("Capturing on Interface %v\n", c.String("interface"))
 			sniff(device, suck)
 			return nil
 		},
@@ -58,7 +58,7 @@ func sniff(device string, suck string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Capturing %v", suck)
+	fmt.Println("Capturing: ", suck)
 
 	// Process packets
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
